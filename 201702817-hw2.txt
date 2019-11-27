@@ -1,0 +1,45 @@
+컴퓨터전자시스템공학부 201702817 이지아
+상황: make라는 명령을 만들어 새로운 process를 백그라운드 형식으로 여러개 fork시키고 그 후 nice값을 바꿔주면 process 상태들이 바뀌는 것을 볼 수 있음
+
+1. proc.h
+proc 구조체에 priority 변수를 추가
+
+2. proc.c
+allocproc()에 초기 priority값 할당
+chagePriority()함수는 priority값을 바꿀 함수
+lock을 얻은 후에 현재 프로세스의 priority값을 할당한후 lock을 풀어줌
+scheduler()함수부분은 가장 priority가 높은 현재 작동 중인 프로세스를 선택
+가장 높은 priority를 가진 프로세스를 선택하고 만약 현재 프로세스의 nice값이 더 낮으면 현재 프로세스는 priority가 높아짐(물론 현재 프로세스가 RUNNABLE이라는 전제 하) 
+
+3.make.c
+make라는 이름으로 프로세서들을 background(&)로 생성할 예정
+parent 프로세스가 백그라운드 형식으로 child 프로세스를 만들 것
+
+4.sysproc.c
+sys_changePriority()의 커널함수가 user함수 changePriority()를 호출하여 찾고자 하는 pid의 priority값을 변경
+
+5.syscall.c
+syscall함수 sys_pidState()와 sys_changePriority() 외부 정의
+
+6.syscall.h
+syscall number을 pidState는 26번, changePriority는 27번으로 설정
+
+7.snice.c
+저번 과제에 changePriority()함수를 호출하여 찾고자 하는 pid의 priority값을 변경(nice값을 변경했기 때문에 그에 따라 priority값도 변경됨)
+
+8.exec.c
+현재 priority 상태를 초기 할당
+
+9.defs.h
+proc.c부분에서 구현했던 pidState()함수와 changePriority()함수를 정의
+
+10.ps.c
+이 함수에서 pidState()함수를 호출하여 process상태들을 출력하는 함수 호출
+
+11.user.h
+system call함수들을 선언, 여기서 pidState()와 changePriority()함수들을 선언
+
+12.usys.S
+SYSCALL pidState와 changePriority 선언
+
+
